@@ -1,6 +1,8 @@
 defmodule Beluga.PageController do
   use Beluga.Web, :controller
 
+  alias Beluga.Endpoint
+
   def index(conn, _params),
     do: conn |> render("index.html")
 
@@ -8,11 +10,13 @@ defmodule Beluga.PageController do
 
     :ok = Beluga.DB.clean()
 
-    {:ok, _result} = path
+    {:ok, results} = path
     |> File.stream!()
     |> CSV.decode()
     |> Beluga.DB.insert()
-    |> IO.inspect()
+
+    {:ok, lines} = results |> Beluga.DB.format()
+    Endpoint.broadcast!("beluga", "update", %{lines: lines})
 
     conn
     |> render("index.html")

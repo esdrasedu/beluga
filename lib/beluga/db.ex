@@ -33,4 +33,20 @@ defmodule Beluga.DB do
     {:ok, results}
   end
 
+  def filter(""), do: [{{:"$1", :"$2", :"$3", :"$4", :"$5"}, [], [:"$_"]}]
+
+  def select, do: select("")
+  def select(filters) do
+    Beluga.DB
+    |> :ets.select(filter(filters))
+  end
+
+  def format([{uuid, date, state, metric, value} | tail], acc) do
+    obj = %{uuid: uuid, date: format(date), state: state, metric: metric, value: value}
+    format(tail, (acc ++ [obj]))
+  end
+  def format([], acc), do: {:ok, acc}
+  def format({day, month, year}), do: "#{day}/#{month}/#{year}"
+  def format(rows) when is_list(rows), do: format(rows, [])
+
 end

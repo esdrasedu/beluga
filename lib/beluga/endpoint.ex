@@ -1,7 +1,7 @@
 defmodule Beluga.Endpoint do
   use Phoenix.Endpoint, otp_app: :beluga
 
-  socket "/socket", Beluga.UserSocket
+  socket "/socket", Beluga.Socket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
