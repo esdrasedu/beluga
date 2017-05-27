@@ -24,7 +24,7 @@ export class Upload extends React.Component {
                 <form method="POST" encType="multipart/form-data" ref={this.attachNode.bind(this)}>
                 <FormGroup>
                 <ControlLabel bsClass="btn btn-default btn-primary btn-lg">Clique aqui para fazer uploader do csv
-                <FormControl id="hidden" onChange={this.handleChange} type="file" />
+                <FormControl id="hidden" onChange={this.handleChange} type="file" name="upload[csv]"/>
                 </ControlLabel>
                 </FormGroup>
                 </form>

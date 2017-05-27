@@ -5,6 +5,7 @@ defmodule Beluga.ErrorView do
     "Page not found"
   end
 
+  def render("500.html", %{message: message}), do: message
   def render("500.html", _assigns) do
     "Internal server error"
   end
