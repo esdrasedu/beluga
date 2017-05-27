@@ -25,8 +25,8 @@ config :beluga, Beluga.Endpoint,
     ]
   ]
 
-config :beluga, WebpackIntegration.Endpoint,
-  watchers: [npm: ["run", "watch"]]
+config :beluga, Beluga.Endpoint,
+  watchers: [node: ["node_modules/webpack/bin/webpack.js", "--watch"]]
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
