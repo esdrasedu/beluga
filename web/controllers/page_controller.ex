@@ -12,6 +12,7 @@ defmodule Beluga.PageController do
     |> File.stream!()
     |> CSV.decode()
     |> Beluga.DB.insert()
+    |> IO.inspect()
 
     conn
     |> render("index.html")

@@ -20,7 +20,7 @@ export class Upload extends React.Component {
         return (
                 <Jumbotron>
                 <h1>Beluga desafio</h1>
-                <p>Bem-vindo ao desafio da Beluga</p>
+                <p>Bem-vindo ao desafio da Beluga, lembre-se apenas 1 csv é carregado por vez</p>
                 <form method="POST" encType="multipart/form-data" ref={this.attachNode.bind(this)}>
                 <FormGroup>
                 <ControlLabel bsClass="btn btn-default btn-primary btn-lg">Clique aqui para fazer uploader do csv

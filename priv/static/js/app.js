@@ -17531,7 +17531,7 @@ var Upload = exports.Upload = function (_React$Component) {
                 _react2.default.createElement(
                     "p",
                     null,
-                    "Bem-vindo ao desafio da Beluga"
+                    "Bem-vindo ao desafio da Beluga, lembre-se apenas 1 csv \xE9 carregado por vez"
                 ),
                 _react2.default.createElement(
                     "form",

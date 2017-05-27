@@ -10,8 +10,7 @@ defmodule Beluga do
     children = [
       # Start the endpoint when the application starts
       supervisor(Beluga.Endpoint, []),
-      # Start your own worker by calling: Beluga.Worker.start_link(arg1, arg2, arg3)
-      # worker(Beluga.Worker, [arg1, arg2, arg3]),
+      worker(Beluga.DB, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
