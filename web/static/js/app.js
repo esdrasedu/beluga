@@ -1,27 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import {Upload} from "upload";
+import {Filter} from "filter";
 import {Table} from "table";
 import {Chart} from "chart";
 import {Socket} from "phoenix";
 import {Tabs, Tab} from 'react-bootstrap';
 
 class App extends React.Component {
+
     constructor(props) {
         super(props);
 
-        this.state = {
-            lines: [],
-            chart: {
-                title: {text: ""},
-                xAxis: {categories: []},
-                series: []
-            }
-        };
+        this.handleChange = this.handleChange.bind(this);
 
         let socket = new Socket("/socket");
-        socket.connect();
-
         let channel = socket.channel("beluga");
         channel.on("update", resp => {
             this.setState({
@@ -33,21 +26,32 @@ class App extends React.Component {
                 }
             });
         });
-        channel
-            .join()
-            .receive("ok", resp => {
-                channel.push("init");
-            });
+        channel.join().receive("ok", resp => {
+            channel.push("init");
+        });
+
+        this.state = {
+            lines: [],
+            chart: {
+                title: {text: ""},
+                xAxis: {categories: []},
+                series: []
+            },
+            channel: channel
+        };
+
+        socket.connect();
     }
 
-    handleSelect(eventKey) {
-        event.preventDefault();
+    handleChange(filter) {
+        this.state.channel.push("filter", filter);
     }
 
     render() {
         return(
                 <div>
                 <Upload/>
+                <Filter placeholder="Filtrar resultado"  onChange={this.handleChange} />
                 <Tabs defaultActiveKey={1} id="tabs">
                 <Tab eventKey={1} title="Tabela">
                 <Table lines={this.state.lines}/>
