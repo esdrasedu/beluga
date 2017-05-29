@@ -6,7 +6,6 @@ defmodule Beluga.DB do
   end
 
   def init(_args) do
-    "Init" |> IO.puts()
     Beluga.DB |> :ets.new([:set, :public, :named_table])
     {:ok, nil}
   end
