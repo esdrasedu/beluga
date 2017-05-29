@@ -26,9 +26,11 @@ class App extends React.Component {
         channel.on("update", resp => {
             this.setState({
                 lines: resp.lines,
-                title: {text: ""},
-                xAxis: {categories: resp.chart.axis},
-                series: resp.chart.series
+                chart: {
+                    title: {text: ""},
+                    xAxis: {categories: resp.chart.axis},
+                    series: resp.chart.series
+                }
             });
         });
         channel

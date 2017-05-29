@@ -17747,9 +17747,11 @@ var App = function (_React$Component) {
         channel.on("update", function (resp) {
             _this.setState({
                 lines: resp.lines,
-                title: { text: "" },
-                xAxis: { categories: resp.chart.axis },
-                series: resp.chart.series
+                chart: {
+                    title: { text: "" },
+                    xAxis: { categories: resp.chart.axis },
+                    series: resp.chart.series
+                }
             });
         });
         channel.join().receive("ok", function (resp) {
