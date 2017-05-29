@@ -13,7 +13,9 @@ class App extends React.Component {
         this.state = {
             lines: [],
             chart: {
-                title: {text: ""}
+                title: {text: ""},
+                xAxis: {categories: []},
+                series: []
             }
         };
 
@@ -22,7 +24,12 @@ class App extends React.Component {
 
         let channel = socket.channel("beluga");
         channel.on("update", resp => {
-            this.setState({lines: resp.lines});
+            this.setState({
+                lines: resp.lines,
+                title: {text: ""},
+                xAxis: {categories: resp.chart.axis},
+                series: resp.chart.series
+            });
         });
         channel
             .join()

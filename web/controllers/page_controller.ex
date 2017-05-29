@@ -16,7 +16,8 @@ defmodule Beluga.PageController do
     |> Beluga.DB.insert()
 
     {:ok, lines} = results |> Beluga.DB.format()
-    Endpoint.broadcast!("beluga", "update", %{lines: lines})
+    {:ok, series, axis} = results |> Beluga.DB.chart()
+    Endpoint.broadcast!("beluga", "update", %{lines: lines, chart: %{series: series, axis: axis}})
 
     conn
     |> render("index.html")

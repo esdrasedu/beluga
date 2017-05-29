@@ -6,8 +6,10 @@ defmodule Beluga.Channel do
   end
 
   def handle_in("init", _params, socket) do
-    {:ok, lines} = Beluga.DB.select() |> Beluga.DB.format()
-    socket |> push("update", %{lines: lines})
+    results = Beluga.DB.select()
+    {:ok, lines} = results |> Beluga.DB.format()
+    {:ok, series, axis} = results |> Beluga.DB.chart()
+    socket |> push("update", %{lines: lines, chart: %{series: series, axis: axis}})
     {:noreply, socket}
   end
 

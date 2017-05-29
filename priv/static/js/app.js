@@ -17455,7 +17455,9 @@ var App = function (_React$Component) {
         _this.state = {
             lines: [],
             chart: {
-                title: { text: "" }
+                title: { text: "" },
+                xAxis: { categories: [] },
+                series: []
             }
         };
 
@@ -17464,7 +17466,12 @@ var App = function (_React$Component) {
 
         var channel = socket.channel("beluga");
         channel.on("update", function (resp) {
-            _this.setState({ lines: resp.lines });
+            _this.setState({
+                lines: resp.lines,
+                title: { text: "" },
+                xAxis: { categories: resp.chart.axis },
+                series: resp.chart.series
+            });
         });
         channel.join().receive("ok", function (resp) {
             channel.push("init");

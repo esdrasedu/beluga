@@ -49,4 +49,45 @@ defmodule Beluga.DB do
   def format({day, month, year}), do: "#{day}/#{month}/#{year}"
   def format(rows) when is_list(rows), do: format(rows, [])
 
+  def chart([row | tail], acc) do
+    {:ok, acc} = acc |> acc_chart(row)
+    tail |> chart(acc)
+  end
+  def chart([], acc) do
+    axis = acc |> Map.keys()
+    series = acc
+    |> Map.values()
+    |> Enum.map(&Enum.to_list/1)
+    |> List.flatten()
+    |> Enum.group_by(fn({state, _value})-> state end, fn({_state, value})-> value end)
+    |> Enum.to_list()
+    |> Enum.map(fn({state, data})->
+      %{name: state, data: data}
+    end)
+    {:ok, series, axis}
+  end
+  def chart(list), do: list |> chart(%{})
+
+  def acc_chart(acc, {_uuid, date_raw, state, metric, value_raw}) do
+    date = format(date_raw)
+    value = metric
+    |> case do
+         "Cost" -> -1
+         "Revenue" -> 1
+       end
+       |> Kernel.*(String.to_integer(value_raw))
+
+    states = acc
+    |> get_in([date])
+    |> case do
+         nil -> %{}
+         current -> current
+       end
+    |> Map.put_new(state, 0)
+
+    acc
+    |> Map.put(date, states)
+    |> get_and_update_in([date, state], &{:ok, &1 + value})
+  end
+
 end
