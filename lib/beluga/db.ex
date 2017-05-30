@@ -1,5 +1,6 @@
 defmodule Beluga.DB do
   use GenServer
+  import RegexCase
 
   def start_link() do
     GenServer.start_link(__MODULE__, nil, [])
@@ -32,12 +33,40 @@ defmodule Beluga.DB do
     {:ok, results}
   end
 
-  def filter(""), do: [{{:"$1", :"$2", :"$3", :"$4", :"$5"}, [], [:"$_"]}]
+  def get_filter, do: :ets.lookup(Beluga.DB, :filter)
 
-  def select, do: select("")
-  def select(filters) do
-    Beluga.DB
-    |> :ets.select(filter(filters))
+  def filter(filters) do
+    filters
+    |> String.trim()
+    |> String.split(" ")
+    |> parser_filters([])
+  end
+
+  def parser_filters([], acc),
+    do: [{{:"$1", :"$2", :"$3", :"$4", :"$5"}, acc, [:"$_"]}]
+
+  def parser_filters([filter_raw | tail], acc) do
+    result = regex_case filter_raw do
+      ~r/^.{2}$/ -> [{:==, :"$3", filter_raw}]
+      ~r/^\d{2}\/\d{2}\/\d{4}$/ ->
+        [day, month, year] = filter_raw |> String.split("/")
+        [{:==, :"$2", {{day, month, year}}}]
+      ~r// -> []
+    end
+    |> Kernel.++(acc)
+
+    parser_filters(tail, result)
+  end
+
+  def select, do: get_filter() |> select()
+  def select([]), do: "" |> select()
+  def select(%{}), do: "" |> select()
+  def select([filter: filter]), do: filter |> select()
+  def select(filters) when is_bitstring(filters) do
+    :ets.delete(Beluga.DB, :filter)
+    true = :ets.insert(Beluga.DB, {:filter, filters})
+    filter_parsed = filters |> filter() |> IO.inspect()
+    Beluga.DB |> :ets.select(filter_parsed)
   end
 
   def format([{uuid, date, state, metric, value} | tail], acc) do

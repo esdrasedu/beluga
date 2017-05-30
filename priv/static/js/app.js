@@ -17734,6 +17734,7 @@ var App = function (_React$Component) {
         var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
         _this.handleChange = _this.handleChange.bind(_this);
+        _this.handleFilter = _this.handleFilter.bind(_this);
 
         var socket = new _phoenix.Socket("/socket");
         var channel = socket.channel("beluga");
@@ -17744,7 +17745,8 @@ var App = function (_React$Component) {
                     title: { text: "" },
                     xAxis: { categories: resp.chart.axis },
                     series: resp.chart.series
-                }
+                },
+                filter: resp.filter
             });
         });
         channel.join().receive("ok", function (resp) {
@@ -17758,6 +17760,7 @@ var App = function (_React$Component) {
                 xAxis: { categories: [] },
                 series: []
             },
+            filter: "",
             channel: channel
         };
 
@@ -17768,6 +17771,11 @@ var App = function (_React$Component) {
     _createClass(App, [{
         key: "handleChange",
         value: function handleChange(filter) {
+            this.setState({ filter: filter });
+        }
+    }, {
+        key: "handleFilter",
+        value: function handleFilter(filter) {
             this.state.channel.push("filter", filter);
         }
     }, {
@@ -17777,7 +17785,7 @@ var App = function (_React$Component) {
                 "div",
                 null,
                 _react2.default.createElement(_upload.Upload, null),
-                _react2.default.createElement(_filter.Filter, { placeholder: "Filtrar resultado", onChange: this.handleChange }),
+                _react2.default.createElement(_filter.Filter, { text: this.state.filter, placeholder: "Filtro (exemplo 24/10/2016 SP)", onChange: this.handleChange, onFilter: this.handleFilter }),
                 _react2.default.createElement(
                     _reactBootstrap.Tabs,
                     { defaultActiveKey: 1, id: "tabs" },
@@ -19160,11 +19168,11 @@ var Filter = exports.Filter = function (_React$Component) {
 	_createClass(Filter, [{
 		key: "handleChange",
 		value: function handleChange(e) {
-			this.setState({ text: e.target.value });
-			if (this.props.onChange) {
+			if (this.props.onChange) this.props.onChange(e.target.value);
+			if (this.props.onFilter) {
 				clearTimeout(this.state.timeout);
 				this.state.timeout = setTimeout(function () {
-					this.props.onChange(this.state.text);
+					this.props.onFilter(this.props.text);
 				}.bind(this), this.state.delay);
 			}
 		}
@@ -19174,9 +19182,10 @@ var Filter = exports.Filter = function (_React$Component) {
 			return _react2.default.createElement("input", {
 				type: "text",
 				className: "form-control",
-				value: this.state.text,
+				value: this.props.text,
 				placeholder: this.props.placeholder,
-				onChange: this.handleChange });
+				onChange: this.handleChange
+			});
 		}
 	}]);
 

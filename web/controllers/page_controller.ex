@@ -17,7 +17,13 @@ defmodule Beluga.PageController do
 
     {:ok, lines} = results |> Beluga.DB.format()
     {:ok, series, axis} = results |> Beluga.DB.chart()
-    Endpoint.broadcast!("beluga", "update", %{lines: lines, chart: %{series: series, axis: axis}})
+    filter = Beluga.DB.get_filter()
+    |> case do
+         [] -> ""
+         [filter: filter] when is_bitstring(filter) -> filter
+       end
+
+    Endpoint.broadcast!("beluga", "update", %{filter: filter, lines: lines, chart: %{series: series, axis: axis}})
 
     conn
     |> render("index.html")

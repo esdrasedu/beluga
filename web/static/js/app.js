@@ -13,6 +13,7 @@ class App extends React.Component {
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleFilter = this.handleFilter.bind(this);
 
         let socket = new Socket("/socket");
         let channel = socket.channel("beluga");
@@ -23,7 +24,8 @@ class App extends React.Component {
                     title: {text: ""},
                     xAxis: {categories: resp.chart.axis},
                     series: resp.chart.series
-                }
+                },
+                filter: resp.filter
             });
         });
         channel.join().receive("ok", resp => {
@@ -37,6 +39,7 @@ class App extends React.Component {
                 xAxis: {categories: []},
                 series: []
             },
+            filter: "",
             channel: channel
         };
 
@@ -44,6 +47,9 @@ class App extends React.Component {
     }
 
     handleChange(filter) {
+        this.setState({filter: filter});
+    }
+    handleFilter(filter) {
         this.state.channel.push("filter", filter);
     }
 
@@ -51,7 +57,7 @@ class App extends React.Component {
         return(
                 <div>
                 <Upload/>
-                <Filter placeholder="Filtrar resultado"  onChange={this.handleChange} />
+                <Filter text={this.state.filter} placeholder="Filtro (exemplo 24/10/2016 SP)" onChange={this.handleChange} onFilter={this.handleFilter}/>
                 <Tabs defaultActiveKey={1} id="tabs">
                 <Tab eventKey={1} title="Tabela">
                 <Table lines={this.state.lines}/>
