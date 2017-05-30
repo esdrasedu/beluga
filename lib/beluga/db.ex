@@ -68,8 +68,13 @@ defmodule Beluga.DB do
   def select(filters) when is_bitstring(filters) do
     :ets.delete(Beluga.DB, :filter)
     true = :ets.insert(Beluga.DB, {:filter, filters})
-    filter_parsed = filters |> filter() |> IO.inspect()
-    Beluga.DB |> :ets.select(filter_parsed)
+    filter_parsed = filters |> filter()
+    Beluga.DB
+    |> :ets.select(filter_parsed)
+    |> Enum.sort_by(fn({_uuid, {day, month, year}, _state, _metric, _value})->
+      "#{year}#{month}#{day}"
+      |> String.to_integer()
+    end)
   end
 
   def format([{uuid, date, state, metric, value} | tail], acc) do
