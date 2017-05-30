@@ -35,25 +35,28 @@ defmodule Beluga.DB do
 
   def get_filter, do: :ets.lookup(Beluga.DB, :filter)
 
+  def filter(""), do: parser_filters([])
   def filter(filters) do
     filters
     |> String.trim()
     |> String.split(" ")
-    |> parser_filters([])
+    |> parser_filters({:orelse})
   end
 
+  def parser_filters(filter),
+   do: [{{:"$1", :"$2", :"$3", :"$4", :"$5"}, filter, [:"$_"]}]
   def parser_filters([], acc),
-    do: [{{:"$1", :"$2", :"$3", :"$4", :"$5"}, acc, [:"$_"]}]
+    do: parser_filters([acc])
 
   def parser_filters([filter_raw | tail], acc) do
-    result = regex_case filter_raw do
-      ~r/^.{2}$/ -> [{:==, :"$3", filter_raw}]
+    parsed = regex_case filter_raw do
+      ~r/^.{2}$/ -> {:==, :"$3", filter_raw}
       ~r/^\d{2}\/\d{2}\/\d{4}$/ ->
         [day, month, year] = filter_raw |> String.split("/")
-        [{:==, :"$2", {{day, month, year}}}]
+        {:==, :"$2", {{day, month, year}}}
       ~r// -> []
     end
-    |> Kernel.++(acc)
+    result = Tuple.append(acc, parsed)
 
     parser_filters(tail, result)
   end
@@ -65,7 +68,7 @@ defmodule Beluga.DB do
   def select(filters) when is_bitstring(filters) do
     :ets.delete(Beluga.DB, :filter)
     true = :ets.insert(Beluga.DB, {:filter, filters})
-    filter_parsed = filters |> filter()
+    filter_parsed = filters |> filter() |> IO.inspect()
     Beluga.DB |> :ets.select(filter_parsed)
   end
 
