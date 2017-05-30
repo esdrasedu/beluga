@@ -65,7 +65,7 @@ defmodule Beluga.DB do
   def select(filters) when is_bitstring(filters) do
     :ets.delete(Beluga.DB, :filter)
     true = :ets.insert(Beluga.DB, {:filter, filters})
-    filter_parsed = filters |> filter() |> IO.inspect()
+    filter_parsed = filters |> filter()
     Beluga.DB |> :ets.select(filter_parsed)
   end
 
